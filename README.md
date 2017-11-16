@@ -47,7 +47,7 @@ Change the config/constants.php values to your liking.
     - - User.php                Handle the User data
     - modules
     - - JWT.php                 JWT Class
-    - .htaccess                 Rewrite URL,s handle the Authentication Header
+    - .htaccess                 Allow for pretty URLs, handle the Authentication Header
     - composer.json             Package information
     - index.php                 Brings everything together
 ```
@@ -64,7 +64,9 @@ Change the config/constants.php values to your liking.
 
 ## Middelwares
 
-The JWT (JSON Web Tokens) module is used for this basic example. You can use oAuth or whatever Authentication method you would like.  
+The JWT (JSON Web Tokens) module is used for this basic example.  
+You can use oAuth or whatever Authentication method you would like.  
+
 After passing the Middleware, the 'user_data' will be available in the **$request** variable and can be accessed like this:
 
 ```php
