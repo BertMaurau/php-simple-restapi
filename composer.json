@@ -1,0 +1,15 @@
+{
+    "name": "bertmaurau/php-simple-restapi",
+    "description": "A Simple and Basic Restfull API",
+    "require": {
+        "league/route": "^3.0",
+        "zendframework/zend-diactoros": "^1.6@dev"
+    },
+    "authors": [
+        {
+            "name": "Bert Maurau",
+            "email": "hello@bertmaurau.be"
+        }
+    ],
+    "minimum-stability": "dev"
+}
