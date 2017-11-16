@@ -75,8 +75,8 @@ class BaseModel
     {
         // Build WHERE conditions
         $conditions = array();
-        foreach (static::FILTERS as $field => $value) {
-            if (in_array($field, $this -> allowed_filters)) {
+        foreach ($filter as $field => $value) {
+            if (in_array($field, static::FILTERS)) {
                 $conditions[] = "`$field` LIKE '%$value%'";
             }
         }
