@@ -1,5 +1,20 @@
 <?php
 
+// Handle CORS
+// Modify to your own specifications
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Credentials: true");
+header('Access-Control-Allow-Methods: POST, GET, DELETE, PUT, PATCH, OPTIONS');
+header('Access-Control-Allow-Headers: Authorization, X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, Cache-Control, Pragma, Accept-Encoding');
+header('Access-Control-Max-Age: 1728000');
+
+// If the clientside requests a preflight OPTIONS request due to custom headers or some sort
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Content-Length: 0');
+    header('Content-Type: text/plain');
+    die();
+}
+
 // Set all dates to the UTC
 date_default_timezone_set('UTC');
 
