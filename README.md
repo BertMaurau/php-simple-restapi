@@ -1,4 +1,5 @@
 # Simple Restful API Example
+A plain and simple PHP Restful API-base without the overhead of existing frameworks.
 
 Just a simple PHP "seed" project that can be used to quickly get started with your own restful API. 
 
