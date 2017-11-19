@@ -56,11 +56,12 @@ Change the config/constants.php values to your liking.
 ## Endpoints
 
 ```
-    GET     /users          Get all Users ( allowed filters = ['firstname', 'lastname', 'email'] ex. /users?firstname=john )  
-    GET     /users/{id}     Get a specific User  
-    POST    /users          Create a new User  
-    PATCH   /users/{id}     Update an existing User   
-    DELETE  /users/{id}     Delete an existing User  
+    GET     /users          		Get all Users ( allowed filters = ['firstname', 'lastname', 'email'] ex. /users?firstname=john )  
+    GET     /users/{id}     		Get a specific User  
+    POST    /users          		Create a new User  
+    PATCH   /users/{id}     		Update an existing User   
+    DELETE  /users/{id}     		Delete an existing User  
+    POST    /users/validate_login	Validate the login based on post credentials
 ```
 
 ## Middelwares
