@@ -1,6 +1,34 @@
 <?php
 
 /**
+ * The actual middleware function that gets called upon routing
+ */
+$authentication = function ($request, $response, callable $next) {
+
+    // Get the Token
+    $token = getBearerToken();
+    if ($token) {
+        try {
+            // Get the JSON data that has been encoded (can contain whatever you like)
+            // and add that data to the request object that gets passed to the controllers
+            $request -> user_data = (object) json_decode(JWT::decode($token, Constants::JWT_SECRET));
+        } catch (Exception $ex) {
+            // Send response when the integrity of the Token doesn't failed
+            $response -> getBody() -> write(Output::JSON(array("code" => 401, "message" => "Not Authorized!")));
+            return $response -> withStatus(401);
+        }
+    } else {
+        // The response when there is no Token present
+        $response -> getBody() -> write(Output::JSON(array("code" => 401, "message" => "Not Authorized!")));
+        return $response -> withStatus(401);
+    }
+
+    // Continue the request if the user is allowed
+    $response = $next($request, $response);
+    return $response;
+};
+
+/**
  * Get the Authorization header from the request Headers
  * @return string $header
  */
@@ -42,31 +70,3 @@ function getBearerToken()
         return null;
     }
 }
-
-/**
- * The actual middleware function that gets called upon routing
- */
-$authentication = function ($request, $response, callable $next) {
-
-    // Get the Token
-    $token = getBearerToken();
-    if ($token) {
-        try {
-            // Get the JSON data that has been encoded (can contain whatever you like)
-            // and add that data to the request object that gets passed to the controllers
-            $request -> user_data = (object) json_decode(JWT::decode($token, Constants::JWT_SECRET));
-        } catch (Exception $ex) {
-            // Send response when the integrity of the Token doesn't failed
-            $response -> getBody() -> write(json_encode(array("code" => 401, "message" => "Not Authorized!")));
-            return $response -> withStatus(401);
-        }
-    } else {
-        // The response when there is no Token present
-        $response -> getBody() -> write(json_encode(array("code" => 401, "message" => "Not Authorized!")));
-        return $response -> withStatus(401);
-    }
-
-    // Continue the request if the user is allowed
-    $response = $next($request, $response);
-    return $response;
-};
