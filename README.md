@@ -13,21 +13,26 @@ This includes
 
 ## Installation
 
+Clone this repo into your destination folder.
+
+Download the required dependencies via Composer.
 ```
     composer install
 ```
 
-Import the provided database dump to get started.
+Change the **config/Constants.php** values to your liking.
+
+(optional)
+To get started, you can import the provided .sql dump into your local database.
 ```
     database.sql
 ```
 
-Change the config/constants.php values to your liking.
-
 ## Dependencies
 
-    - Route (https://github.com/thephpleague/route)
-    - Zend Diactoros (https://github.com/zendframework/zend-diactoros)
+    - PHP >= 5.4.0  
+    - Route (https://github.com/thephpleague/route)  
+    - Zend Diactoros (https://github.com/zendframework/zend-diactoros)  
 
 ## Modules
 
@@ -37,20 +42,20 @@ Change the config/constants.php values to your liking.
 
 ```
     - config
-    - - Constants.php           Contains salts, db credentials,..
-    - - Output.php              Contains the different Outputs (JSON and Exceptions)
+      - Constants.php           Contains salts, db credentials,..
+      - Output.php              Contains the different Outputs (JSON and Exceptions)
     - controllers
-    - - BaseController.php      Handle the basic request actions (index, show, create, update, delete)
-    - - UserController.php      Handle User request actions (register, login)
+      - BaseController.php      Handle the basic request actions (index, show, create, update, delete)
+      - UserController.php      Handle User request actions (register, login)
     - database
-    - - db.php                  Handle DB Connection
+      - db.php                  Handle DB Connection
     - middlewares
-    - - authentication.php      Contains the Authentication Middleware
+      - authentication.php      Contains the Authentication Middleware
     - models
-    - - BaseModel.php           Handle the basics (insert, update, map, delete,..)
-    - - User.php                Handle login, register
+      - BaseModel.php           Handle the basics (insert, update, map, delete,..)
+      - User.php                Handle login, register
     - modules
-    - - JWT.php                 JWT Class
+      - JWT.php                 JWT Class
     - .htaccess                 Allow for pretty URLs, handle the Authentication Header
     - composer.json             Package information
     - index.php                 Brings everything together
@@ -99,8 +104,43 @@ Example
     $route -> map('GET', '/users', [new UserController, 'index']) -> middleware($authentication);
 ```
 
-
 Don't forget to define/create your controller to handle the requests actions. The 'index' refers to the function 'index' within the 'BaseController'.
+
+## Create a new Controller
+
+To create a new Controller (without extra functionalities) and use the basic endpoints.
+
+```php
+class NotesController extends BaseController
+{
+    // Set the current ModelName
+    const MODEL_NAME = "Note";
+}
+```
+
+## Create a new Model
+
+To create a new Model (without extra functionalities) and use the basic functions.
+
+```php
+class Note extends BaseModel
+{
+    // Reference to the Database table
+    const DB_TABLE = "notes";
+    // Allowed filter params for the get requests
+    const FILTERS = ['note'];
+    // Does the table have timestamps?
+    const TIMESTAMPS = false;
+    
+    // integer
+    public $id;
+    // string
+    public $note;
+    
+    // GETTERS (optional)
+    // SETTERS (optional) If no setters are defined, all values will be put under the `attributes` property.
+}
+```
 
 ## Example
 
@@ -132,4 +172,11 @@ Response
     }
 ```
 
-### 
+### Extra
+
+This is not a high quality starting point, but this will get you started.  
+There are a lot of possibilites for improvement like the Model functions (getAll, insert, ..).  
+
+Make sure to check that everything is secure, that there are no leaks or possibilites to insert non-allowed data etc.
+
+The index.php could use some cleanup with the requrirements, the routing, .. 
