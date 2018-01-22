@@ -97,7 +97,7 @@ class BaseModel
         } else {
             $response = [];
             while ($row = $result -> fetch_assoc()) {
-                $response[] = new $this -> createObjectFromProperties($row);
+                $response[] = (new $this) -> map($row);
             }
             return $response;
         }
@@ -133,8 +133,10 @@ class BaseModel
     {
         // This should be modified, write it more securly to prevent from trying to insert public properties
         foreach ($this as $key => $value) {
-            $keys[] = '`' . $key . '`';
-            $values[] = DB::escape($value);
+            if ($key !== 'attributes') {
+                $keys[] = '`' . $key . '`';
+                $values[] = DB::escape($value);
+            }
         }
 
         // Do checks here for security..
@@ -156,7 +158,9 @@ class BaseModel
     {
         // This should be modified, write it more securly to prevent from trying to insert public properties
         foreach ($this as $key => $value) {
-            $update[] = $key . " = '" . DB::escape($value) . "'";
+            if ($key !== 'attributes') {
+                $update[] = $key . " = '" . DB::escape($value) . "'";
+            }
         }
 
         $sql = "UPDATE " . static::DB_TABLE . " SET " . implode(",", $update) . " WHERE id = " . $this -> getId() . ";";
