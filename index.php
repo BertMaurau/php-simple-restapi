@@ -21,7 +21,9 @@ date_default_timezone_set('UTC');
 // DB Connection
 require_once 'databases/db.php';
 // Config
-require_once 'config/constants.php';
+require_once 'config/Constants.php';
+require_once 'config/Output.php';
+
 
 // Load Middleware
 require_once 'middlewares/authentication.php';
@@ -46,7 +48,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 // Connect with the DB
-DB::init();
+try {
+    DB::init();
+} catch (Exception $ex) {
+    echo "Failed to connect with DB. Reason: " . $ex -> getMessage();
+    exit;
+}
 
 $container = new League\Container\Container;
 
@@ -69,7 +76,7 @@ $route = new League\Route\RouteCollection;
 // ----------------------------------------------------------
 // Index
 $route -> map('GET', '/', function(ServerRequestInterface $request, ResponseInterface $response) {
-    $response -> getBody() -> write("Hello World!");
+    $response -> getBody() -> write(Output::JSON("Hello World!"));
     return $response -> withStatus(200);
 });
 
