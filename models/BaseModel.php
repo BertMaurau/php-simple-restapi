@@ -8,22 +8,59 @@
 class BaseModel
 {
 
+    // |------------------------------------------------------------------------
+    // |  Model Configuration
+    // |------------------------------------------------------------------------
+    // Reference to the Database table
     const DB_TABLE = "";
+    // Allowed filter params for the get requests
     const FILTERS = [];
+    // Does the table have timestamps?
+    const TIMESTAMPS = false;
 
+    // |------------------------------------------------------------------------
+    // |  Properties
+    // |------------------------------------------------------------------------
+    // holds extra attributes that are not model-properties
+    public $attributes = array();
+
+    // |------------------------------------------------------------------------
+    // |  Model Functions
+    // |------------------------------------------------------------------------
     /**
      * Map the given properties to self
      * @param object $properties
      * @return $this
      */
-    public function createObjectFromProperties($properties = null)
+    public function map($properties = null)
     {
         if (isset($properties)) {
+            // loop properties and attempt to call the setter
             foreach ($properties as $key => $value) {
-                $this -> {$key} = $value;
+                $setter = 'set' . ucfirst($key);
+                // check if the setter exists and is callable
+                if (is_callable(array($this, $setter))) {
+                    // execute the setter
+                    call_user_func(array($this, $setter), $value);
+                } else {
+                    // not a property, add to the attributes list
+                    $this -> addAttribute($key, $value);
+                }
             }
             return $this;
         }
+    }
+
+    /**
+     * Add item as attribute
+     * @param string $property
+     * @param any $value
+     * @return $this
+     */
+    public function addAttribute($property, $value)
+    {
+        $this -> attributes[$property] = $value;
+        return $this;
     }
 
     /**
@@ -38,7 +75,7 @@ class BaseModel
             return false;
         } else {
             // Create an object from the result
-            return $this -> createObjectFromProperties($result -> fetch_assoc());
+            return $this -> map($result -> fetch_assoc());
         }
     }
 
@@ -55,7 +92,7 @@ class BaseModel
             if ($result -> num_rows < 1) {
                 return false;
             } else {
-                return $this -> createObjectFromProperties($result -> fetch_assoc());
+                return $this -> map($result -> fetch_assoc());
             }
         } else {
             $response = [];
@@ -83,7 +120,7 @@ class BaseModel
         $response = [];
         $result = DB::query("SELECT * FROM " . static::DB_TABLE . " " . ((count($conditions)) ? "WHERE " . implode(' AND ', $conditions) : "") . ";");
         while ($row = $result -> fetch_assoc()) {
-            $response[] = (new $this) -> createObjectFromProperties($row);
+            $response[] = (new $this) -> map($row);
         }
         return $response;
     }
