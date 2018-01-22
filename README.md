@@ -30,9 +30,9 @@ To get started, you can import the provided .sql dump into your local database.
 
 ## Dependencies
 
-    - PHP >= 5.4.0   
-    - Route (https://github.com/thephpleague/route)
-    - Zend Diactoros (https://github.com/zendframework/zend-diactoros)
+    - PHP >= 5.4.0  
+    - Route (https://github.com/thephpleague/route)  
+    - Zend Diactoros (https://github.com/zendframework/zend-diactoros)  
 
 ## Modules
 
