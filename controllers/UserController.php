@@ -29,7 +29,7 @@ class UserController extends BaseController
         $token = JWT::encode(json_encode(array('user_id' => $user -> getId())), Constants::JWT_SECRET);
 
         // Add the token to the response
-        $user -> token = $token;
+        $user -> addAttribute('token', $token);
 
         return Output::OK($response, $user);
     }
@@ -64,7 +64,7 @@ class UserController extends BaseController
         $token = JWT::encode(json_encode(array('user_id' => $user -> getId())), Constants::JWT_SECRET);
 
         // Add the token to the response
-        $user -> token = $token;
+        $user -> addAttribute('token', $token);
 
         return Output::OK($response, $user);
     }
