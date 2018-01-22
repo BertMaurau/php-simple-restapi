@@ -37,15 +37,18 @@ Change the config/constants.php values to your liking.
 
 ```
     - config
-    - - constants.php           Contains salts, db credentials,..
+    - - Constants.php           Contains salts, db credentials,..
+    - - Output.php              Contains the different Outputs (JSON and Exceptions)
     - controllers
-    - - UserController.php      Handle User request actions
+    - - BaseController.php      Handle the basic request actions (index, show, create, update, delete)
+    - - UserController.php      Handle User request actions (register, login)
     - database
     - - db.php                  Handle DB Connection
     - middlewares
     - - authentication.php      Contains the Authentication Middleware
     - models
-    - - User.php                Handle the User data
+    - - BaseModel.php           Handle the basics (insert, update, map, delete,..)
+    - - User.php                Handle login, register
     - modules
     - - JWT.php                 JWT Class
     - .htaccess                 Allow for pretty URLs, handle the Authentication Header
@@ -97,7 +100,7 @@ Example
 ```
 
 
-Don't forget to define/create your controller to handle the requests actions. The 'index' refers to the function 'index' within the 'UserController'.
+Don't forget to define/create your controller to handle the requests actions. The 'index' refers to the function 'index' within the 'BaseController'.
 
 ## Example
 
@@ -119,11 +122,13 @@ Request
 Response
 ```json
     {
-        "id": 1,
-        "firstname": "John",
-        "lastname": "Doe",
-        "email": "john.doe@gmail.com",
-        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IntcInVzZXJfaWRcIjoxfSI.irxM5UgwU5885UHSyXWEv45KYcdw1RRh6NKqZwW6goE"
+         "id": 4,
+         "firstname": "John",
+         "lastname": "Doe",
+         "email": "john.doe11@gmail.com",
+         "attributes": {
+             "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IntcInVzZXJfaWRcIjo0fSI.DbVv09BkwgVK8lSVuEWnuWe--H4q-Vitt9OwJa0_-Lk"
+         }
     }
 ```
 
