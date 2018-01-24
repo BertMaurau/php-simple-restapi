@@ -11,7 +11,9 @@ $authentication = function ($request, $response, callable $next) {
         try {
             // Get the JSON data that has been encoded (can contain whatever you like)
             // and add that data to the request object that gets passed to the controllers
-            $request -> user_data = (object) json_decode(JWT::decode($token, Constants::JWT_SECRET));
+            $sessionProperties = (object) json_decode(JWT::decode($token, Constants::JWT_SECRET));
+            // Load into Session
+            (new Session()) -> loadSession($sessionProperties);
         } catch (Exception $ex) {
             // Send response when the integrity of the Token doesn't failed
             $response -> getBody() -> write(Output::JSON(array("code" => 401, "message" => "Not Authorized!")));
