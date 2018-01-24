@@ -30,9 +30,9 @@ To get started, you can import the provided .sql dump into your local database.
 
 ## Dependencies
 
-    - PHP >= 5.4.0  
-    - Route (https://github.com/thephpleague/route)  
-    - Zend Diactoros (https://github.com/zendframework/zend-diactoros)  
+   - PHP >= 5.4.0  
+   - Route (https://github.com/thephpleague/route)  
+   - Zend Diactoros (https://github.com/zendframework/zend-diactoros)  
 
 ## Modules
 
@@ -41,14 +41,14 @@ To get started, you can import the provided .sql dump into your local database.
 ## Structure
 
 ```
-    - config
+    - app
       - Constants.php           Contains salts, db credentials,..
       - Output.php              Contains the different Outputs (JSON and Exceptions)
+      - DB.php			Handles the Database connection
+      - Session.php		Handles the active User Session
     - controllers
       - BaseController.php      Handle the basic request actions (index, show, create, update, delete)
       - UserController.php      Handle User request actions (register, login)
-    - database
-      - db.php                  Handle DB Connection
     - middlewares
       - authentication.php      Contains the Authentication Middleware
     - models
@@ -64,6 +64,7 @@ To get started, you can import the provided .sql dump into your local database.
 ## Endpoints
 
 ```
+    GET     /me     			Get the currently logged-in User (showing the Session part) 
     GET     /users          		Get all Users ( allowed filters = ['firstname', 'lastname', 'email'] ex. /users?firstname=john )  
     GET     /users/{id}     		Get a specific User  
     POST    /users          		Create a new User  
