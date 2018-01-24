@@ -70,7 +70,11 @@ class BaseModel
      */
     public function getById($id)
     {
-        $result = DB::query("SELECT * FROM " . static::DB_TABLE . " WHERE id = $id LIMIT 1;");
+        $query = " SELECT * "
+                . "FROM " . static::DB_TABLE . " "
+                . "WHERE id = $id "
+                . "LIMIT 1;";
+        $result = DB::query($query);
         if ($result -> num_rows < 1) {
             return false;
         } else {
@@ -85,10 +89,14 @@ class BaseModel
      * @param type $value
      * @return $this
      */
-    public function findBy($field, $value, $limit = null)
+    public function findBy($field, $value, $take = 120, $skip = 0)
     {
-        $result = DB::query("SELECT * FROM " . static::DB_TABLE . " WHERE $field = '" . DB::escape($value) . "' " . (($limit) ? "LIMIT $limit" : "") . ";");
-        if ($limit && $limit === 1) {
+        $query = " SELECT * "
+                . "FROM " . static::DB_TABLE . " "
+                . "WHERE $field = '" . DB::escape($value) . "' "
+                . "LIMIT $take OFFSET $skip;";
+        $result = DB::query($query);
+        if ($take && $take === 1) {
             if ($result -> num_rows < 1) {
                 return false;
             } else {
@@ -117,8 +125,17 @@ class BaseModel
                 $conditions[] = "`$field` LIKE '%$value%'";
             }
         }
+
+        // Pagination
+        $take = (isset($filters['take']) && is_int($filters['take'])) ? $filters['take'] : 100;
+        $skip = (isset($filters['skip']) && is_int($filters['skip'])) ? $filters['skip'] : 0;
+
         $response = [];
-        $result = DB::query("SELECT * FROM " . static::DB_TABLE . " " . ((count($conditions)) ? "WHERE " . implode(' AND ', $conditions) : "") . ";");
+        $query = " SELECT * "
+                . "FROM " . static::DB_TABLE . " "
+                . "" . ((count($conditions)) ? " WHERE " . implode(' AND ', $conditions) : "") . " "
+                . "LIMIT $take OFFSET $skip;";
+        $result = DB::query($query);
         while ($row = $result -> fetch_assoc()) {
             $response[] = (new $this) -> map($row);
         }
@@ -141,8 +158,10 @@ class BaseModel
 
         // Do checks here for security..
 
-        $sql = "INSERT INTO " . static::DB_TABLE . "(" . implode(",", $keys) . ") VALUES ('" . implode("','", $values) . "');";
-        $result = DB::query($sql);
+        $query = " INSERT "
+                . "INTO " . static::DB_TABLE . "(" . implode(",", $keys) . ") "
+                . "VALUES ('" . implode("','", $values) . "');";
+        $result = DB::query($query);
 
         // Get the ID
         $this -> id = DB::getId();
@@ -163,8 +182,10 @@ class BaseModel
             }
         }
 
-        $sql = "UPDATE " . static::DB_TABLE . " SET " . implode(",", $update) . " WHERE id = " . $this -> getId() . ";";
-        $result = DB::query($sql);
+        $query = " UPDATE " . static::DB_TABLE . " "
+                . "SET " . implode(",", $update) . " "
+                . "WHERE id = " . $this -> getId() . ";";
+        $result = DB::query($query);
 
         return $this;
     }
@@ -175,8 +196,9 @@ class BaseModel
      */
     public function delete()
     {
-        $sql = "DELETE FROM " . static::DB_TABLE . " WHERE id = " . $this -> getId() . ";";
-        $result = DB::query($sql);
+        $query = " DELETE FROM " . static::DB_TABLE . " "
+                . "WHERE id = " . $this -> getId() . ";";
+        $result = DB::query($query);
 
         return $this;
     }
