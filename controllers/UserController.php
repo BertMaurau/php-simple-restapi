@@ -11,6 +11,15 @@ class UserController extends BaseController
     // Set the current ModelName
     const MODEL_NAME = "User";
 
+    // Handle me request
+    public function me($request, $response)
+    {
+
+        // Call the BaseController `index` function
+        // That function will return an Output, so no need to Output again.
+        return $this -> show($request, $response, array('id' => Session::getUserId()));
+    }
+
     // Handle login request
     public function login($request, $response)
     {
@@ -26,7 +35,7 @@ class UserController extends BaseController
         }
 
         // Generate Token
-        $token = JWT::encode(json_encode(array('user_id' => $user -> getId())), Constants::JWT_SECRET);
+        $token = JWT::encode(json_encode(array('userId' => $user -> getId())), Constants::JWT_SECRET);
 
         // Add the token to the response
         $user -> addAttribute('token', $token);
@@ -43,7 +52,7 @@ class UserController extends BaseController
         // Do validation on posted fields..
         // ...
         // Check if email exists
-        $user = (new User()) -> findBy('email', $postdata -> email);
+        $user = (new User()) -> findBy('email', $postdata -> email, $take = 1);
         if ($user) {
             return Output::Conflict($response, 'User with email ' . $postdata -> email . ' already exists!');
         }
@@ -61,7 +70,7 @@ class UserController extends BaseController
         $id = $user -> getId();
 
         // Generate Token
-        $token = JWT::encode(json_encode(array('user_id' => $user -> getId())), Constants::JWT_SECRET);
+        $token = JWT::encode(json_encode(array('userId' => $user -> getId())), Constants::JWT_SECRET);
 
         // Add the token to the response
         $user -> addAttribute('token', $token);
