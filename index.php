@@ -19,10 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 date_default_timezone_set('UTC');
 
 // DB Connection
-require_once 'databases/db.php';
+require_once 'app/DB.php';
 // Config
-require_once 'config/Constants.php';
-require_once 'config/Output.php';
+require_once 'app/Constants.php';
+require_once 'app/Output.php';
+require_once 'app/Session.php';
 
 
 // Load Middleware
@@ -82,14 +83,34 @@ $route -> map('GET', '/', function(ServerRequestInterface $request, ResponseInte
 
 // User
 // Basic Actions
-$route -> map('GET', '/users', [new UserController, 'index']) -> middleware($authentication);
-$route -> map('GET', '/users/{id}', [new UserController, 'show']) -> middleware($authentication);
-$route -> map('PATCH', '/users', [new UserController, 'update']) -> middleware($authentication);
-$route -> map('DELETE', '/users', [new UserController, 'delete']) -> middleware($authentication);
-// Routes without authentication
-$route -> map('POST', '/users/validate_login', [new UserController, 'login']);
-$route -> map('POST', '/users', [new UserController, 'register']);
+// ----------------------------------------------------------------
+// Get the currently logged-in user
+$route -> map('GET', '/me', [new UserController, 'me']) -> middleware($authentication);
 
+// List all Users (Paginate with take/skip parameters)
+$route -> map('GET', '/users', [new UserController, 'index']) -> middleware($authentication);
+
+// Get a specific User by ID
+$route -> map('GET', '/users/{id}', [new UserController, 'show']) -> middleware($authentication);
+
+// |----------------------------------------------------------------------
+// | Remark: Next two routes shouldn't be available for default Users.
+// | This could allow them to update or delete another user.
+// | Depends on your situation ofcourse
+// |----------------------------------------------------------------------
+// Update a specific User by ID
+$route -> map('PATCH', '/users/{id}', [new UserController, 'update']) -> middleware($authentication);
+
+// Get a specific User by ID
+$route -> map('DELETE', '/users/{id}', [new UserController, 'delete']) -> middleware($authentication);
+
+// Routes without authentication
+// ----------------------------------------------------------------
+// Validate the given Login
+$route -> map('POST', '/users/validate_login', [new UserController, 'login']);
+
+// Register a new User
+$route -> map('POST', '/users', [new UserController, 'register']);
 
 // Dispatch the request to the controller
 $response = $route -> dispatch($container -> get('request'), $container -> get('response'));
