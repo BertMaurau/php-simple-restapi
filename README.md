@@ -78,10 +78,10 @@ To get started, you can import the provided .sql dump into your local database.
 The JWT (JSON Web Tokens) module is used for this basic example.  
 You can use oAuth or whatever Authentication method you would like.  
 
-After passing the Middleware, the 'user_data' will be available in the **$request** variable and can be accessed like this:
+After passing the Middleware, the 'user_data' will be available in the **Session** class and can be accessed like this:
 
 ```php
-    $id_of_user_logged_in = $request -> user_data -> user_id;
+    Session::getUserId();
 ```
 
 Response when the Token is invalid or missing
@@ -91,6 +91,15 @@ Response when the Token is invalid or missing
         "message": "Not Authorized!"
     }
 ``` 
+
+## Session
+
+I added a class called Session. This has nothing to do with an actual PHP session or anything.  
+This class can be used to share stuff from the Middleware arround the API.
+
+**For example.** After logging in, you decide to keep track of the UserID, the Language, other stuff.. and pass these values via the JWT Token. You can then add properties to the Session class (this has currently only the UserID). Then, when you need to access that value, you can call `Session::get{Property}();` to access that Token-shared-value.
+
+The middleware loads the Token-stored-properties via `(new Session()) -> loadSession($decoded_JWT_array);`
 
 ## Register a new Route
 
