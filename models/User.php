@@ -43,7 +43,14 @@ class User extends BaseModel
      */
     public function validateLogin($email, $password)
     {
-        $result = DB::query("SELECT * FROM " . static::DB_TABLE . " WHERE email = '" . DB::escape($email) . "' AND password = '" . DB::escape($password) . "';");
+        // do not forget to call your setter first to do any manipulations
+        // like hashing the password..
+        $this -> setEmail($email) -> setPassword($password);
+
+        $query = "SELECT * FROM " . static::DB_TABLE . " "
+                . "WHERE email = '" . DB::escape($this -> getEmail()) . "' "
+                . " AND password = '" . DB::escape($this -> getPassword()) . "';";
+        $result = DB::query($query);
         if ($result -> num_rows < 1) {
             return null;
         } else if ($result -> num_rows > 1) {
