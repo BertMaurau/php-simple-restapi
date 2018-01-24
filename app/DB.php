@@ -58,7 +58,9 @@ class DB
      */
     public static function query($sql)
     {
-        $result = self::$mysqli -> query($sql);
+        if (!$result = self::$mysqli -> query($sql)) {
+            throw new Exception(self::getLastError());
+        }
         return $result;
     }
 
