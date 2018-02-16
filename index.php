@@ -18,32 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Set all dates to the UTC
 date_default_timezone_set('UTC');
 
-// DB Connection
-require_once 'app/DB.php';
-// Config
-require_once 'app/Constants.php';
-require_once 'app/Output.php';
-require_once 'app/Session.php';
-
-
-// Load Middleware
-require_once 'middlewares/authentication.php';
-
-// Load Modules
-require_once 'modules/JWT.php';
-
-// Load all Models
-foreach (glob("models/*.php") as $model) {
-    require_once $model;
-}
-
-// Load all controllers
-foreach (glob("controllers/*.php") as $controller) {
-    require_once $controller;
-}
-
-// include the Composer autoloader
-require_once 'vendor/autoload.php';
+require 'loader.php';
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -77,8 +52,7 @@ $route = new League\Route\RouteCollection;
 // ----------------------------------------------------------
 // Index
 $route -> map('GET', '/', function(ServerRequestInterface $request, ResponseInterface $response) {
-    $response -> getBody() -> write(Output::JSON("Hello World!"));
-    return $response -> withStatus(200);
+    return Output::OK($response, "Hello World!");
 });
 
 // User
@@ -112,6 +86,16 @@ $route -> map('POST', '/users/validate_login', [new UserController, 'login']);
 // Register a new User
 $route -> map('POST', '/users', [new UserController, 'register']);
 
+// Other Examples
+// ----------------------------------------------------------------
+// Group middleware
+// $route -> group('/customers', function ($route) {
+//
+//     $route -> map('GET', '/', [new CustomerController, 'index']);
+//     $route -> map('POST', '/', [new CustomerController, 'create']);
+//     //...
+//
+// }) -> middleware($authentication);
 // Dispatch the request to the controller
 $response = $route -> dispatch($container -> get('request'), $container -> get('response'));
 
