@@ -16,21 +16,29 @@ class BaseModel
     // Allowed filter params for the get requests
     const FILTERS = [];
     // Does the table have timestamps?
+    // (created_at, updated_at, deleted_at)
     const TIMESTAMPS = false;
     // Use soft deletes?
+    // (prevent actual record deletions, just update the deleted_at timestamp)
     const SOFT_DELETES = true;
-    // Validation rules
+    // Validation rules 'property' => [required, varType, min(length), max(length)]
+    // (Ex. 'name' => [true, 'string', 1, 120])
     const VALIDATION = [];
 
     // |------------------------------------------------------------------------
     // |  Properties
     // |------------------------------------------------------------------------
     // holds extra attributes that are not model-properties
+    // items that don't have any setters
     public $attributes = array();
 
     // |------------------------------------------------------------------------
     // |  Model Functions
     // |------------------------------------------------------------------------
+    /**
+     * Validate the current model's properties using the validation rules
+     * @return array valid|reason
+     */
     public function validate()
     {
         // check if there are validation rules
