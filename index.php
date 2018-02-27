@@ -35,10 +35,9 @@ $container = new League\Container\Container;
 
 $container -> share('response', Zend\Diactoros\Response::class);
 $container -> share('request', function () {
-    // Change this if the "api" is not running on the root of the domain
+    // Change Constants API ROOT if the "api" is not running on the root of the domain
     // For ex. if this is hosted within a subdir API then set this to "/api"
-    $loc = "php-simple-restapi/";
-    $_SERVER['REQUEST_URI'] = str_replace($loc, '', $_SERVER['REQUEST_URI']);
+    $_SERVER['REQUEST_URI'] = str_replace(Constants::API_ROOT, '', $_SERVER['REQUEST_URI']);
     return Zend\Diactoros\ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
 });
 

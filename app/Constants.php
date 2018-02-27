@@ -8,6 +8,8 @@
 class Constants
 {
 
+    // Root of the API (the dir where index gets hosted)
+    const API_ROOT = 'php-simple-restapi/';
     // The secret used for encrypting/decrypting the JWT Token
     const JWT_SECRET = '3-V{ii7y/|PNo~pU571q#ASJwA%9Csq2+3Ezj7-];<Q!&m}Wl[VDXGwPi^2!T#OV';
     // Salt used for generating hashed passwords
