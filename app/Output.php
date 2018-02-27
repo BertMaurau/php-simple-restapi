@@ -12,6 +12,7 @@ class Output
     const CODE_NOT_FOUND = 404;
     const CODE_CONFLICT = 406;
     const CODE_MISSING_PARAMETER = 406;
+    const CODE_VALIDATION_FAILED = 406;
     const CODE_OK = 200;
 
     /**
@@ -76,6 +77,17 @@ class Output
     public static function Conflict($response, $message)
     {
         return self::JSON($response, self::CODE_CONFLICT, array('code' => self::CODE_CONFLICT, 'message' => $message));
+    }
+
+    /**
+     * Return Conflict status
+     * @param Response $response
+     * @param string $message
+     * @return JSON Output
+     */
+    public static function ValidationFailed($response, $message)
+    {
+        return self::JSON($response, self::CODE_VALIDATION_FAILED, array('code' => self::CODE_VALIDATION_FAILED, 'message' => $message));
     }
 
     /**
