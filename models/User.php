@@ -15,8 +15,16 @@ class User extends BaseModel
     const DB_TABLE = "users";
     // Allowed filter params for the get requests
     const FILTERS = ['firstname', 'lastname', 'email'];
-    // Does the table have timestamps?
+    // Does the table have timestamps? (created_at, updated_at, deleted_at)
     const TIMESTAMPS = true;
+    // Use soft deletes?
+    const SOFT_DELETES = true;
+    // Validation rules
+    const VALIDATION = [
+        'firstname' => [true, 'string', 1, 128],
+        'lastname'  => [true, 'string', 1, 128],
+        'email'     => [true, 'email']
+    ];
 
     // |------------------------------------------------------------------------
     // |  Properties

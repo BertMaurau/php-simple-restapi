@@ -56,7 +56,14 @@ class BaseController
         // Get the POST body
         $postdata = (object) json_decode($request -> getBody(), true);
 
-        $model -> map($postdata) -> insert();
+        $model -> map($postdata);
+
+        // apply validation rules to the mapped object before inserting
+        if (!$validator[0] = $model -> validate()) {
+            return Output::ValidationFailed($response, $validator[1]);
+        }
+        $model -> insert();
+
 
         return Output::OK($response, $model);
     }
@@ -81,7 +88,13 @@ class BaseController
             return Output::ModelNotFound($response, $modelClass, $model);
         }
 
-        $model -> map($postdata) -> update();
+        $model -> map($postdata);
+
+        // apply validation rules to the mapped object before inserting
+        if (!$validator[0] = $model -> validate()) {
+            return Output::ValidationFailed($response, $validator[1]);
+        }
+        $model -> update();
 
         return Output::OK($response, $model);
     }

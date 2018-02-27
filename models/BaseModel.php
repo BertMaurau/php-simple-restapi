@@ -17,6 +17,10 @@ class BaseModel
     const FILTERS = [];
     // Does the table have timestamps?
     const TIMESTAMPS = false;
+    // Use soft deletes?
+    const SOFT_DELETES = true;
+    // Validation rules
+    const VALIDATION = [];
 
     // |------------------------------------------------------------------------
     // |  Properties
@@ -27,6 +31,70 @@ class BaseModel
     // |------------------------------------------------------------------------
     // |  Model Functions
     // |------------------------------------------------------------------------
+    public function validate()
+    {
+        // check if there are validation rules
+        if (count(static::VALIDATION) < 1) {
+            // if not, just return valid
+            return [true, 'OK'];
+        }
+
+        // get object properties
+        $properties = get_object_vars($this);
+        foreach ($properties as $property => $value) {
+            // check with validation rule
+            // check if property has a rule
+            if (isset(static::VALIDATION[$property])) {
+
+                // check if required
+                $reqRequired = static::VALIDATION[$property][0];
+                if (!$value && $reqRequired) {
+                    return [false, "Missing required property " . $property];
+                }
+
+                // check var type
+                $reqVarType = static::VALIDATION[$property][1];
+                $parVarType = gettype($value);
+                if ($parVarType != $reqVarType) {
+                    return [false, "Expected `" . $reqVarType . "`, got `" . $parVarType . "` for " . $property];
+                }
+
+                if ($reqVarType == 'email') {
+                    if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        return [false, $value . " is not a valid email address."];
+                    }
+                } else {
+                    // check min length or value (only strings and integers)
+                    $reqMin = static::VALIDATION[$property][2];
+                    $reqMax = static::VALIDATION[$property][3];
+
+                    if ($reqVarType == 'string') {
+                        $parLength = strlen($value);
+                        if ($parLength < $reqMin) {
+                            return [false, $property . " requires a min-length of " . $reqMin . ". " . $parLength . " given."];
+                        }
+                        if ($parLength > $reqMax) {
+                            return [false, $property . " requires a max-length of " . $reqMax . ". " . $parLength . " given."];
+                        }
+                    }
+                    // check max length or value
+                    if ($reqVarType == 'integer') {
+
+                        if ($value < $reqMin) {
+                            return [false, $property . " has a min-value of " . $reqMin . ". " . $parLength . " given."];
+                        }
+                        if ($value > $reqMax) {
+                            return [false, $property . " has a max-value of " . $reqMax . ". " . $parLength . " given."];
+                        }
+                    }
+                }
+            }
+        }
+
+        // if all passed..
+        return [true, 'OK'];
+    }
+
     /**
      * Map the given properties to self
      * @param object $properties
@@ -73,6 +141,7 @@ class BaseModel
         $query = " SELECT * "
                 . "FROM " . static::DB_TABLE . " "
                 . "WHERE id = $id "
+                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
                 . "LIMIT 1;";
         $result = DB::query($query);
         if ($result -> num_rows < 1) {
@@ -94,6 +163,7 @@ class BaseModel
         $query = " SELECT * "
                 . "FROM " . static::DB_TABLE . " "
                 . "WHERE $field = '" . DB::escape($value) . "' "
+                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         if ($take && $take === 1) {
@@ -133,7 +203,8 @@ class BaseModel
         $response = [];
         $query = " SELECT * "
                 . "FROM " . static::DB_TABLE . " "
-                . "" . ((count($conditions)) ? " WHERE " . implode(' AND ', $conditions) : "") . " "
+                . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         while ($row = $result -> fetch_assoc()) {
@@ -178,7 +249,7 @@ class BaseModel
         // This should be modified, write it more securly to prevent from trying to insert public properties
         foreach ($this as $key => $value) {
             if ($key !== 'attributes') {
-                $update[] = $key . " = '" . DB::escape($value) . "'";
+                $update[] = '`' . $key . '`' . " = '" . DB::escape($value) . "'";
             }
         }
 
@@ -194,11 +265,15 @@ class BaseModel
      * Delete Model
      * @return $this
      */
-    public function delete()
+    public function delete($hardDelete = false)
     {
-        $query = " DELETE FROM " . static::DB_TABLE . " "
-                . "WHERE id = " . $this -> getId() . ";";
-        $result = DB::query($query);
+        if ($hardDelete || !static::SOFT_DELETES) {
+            $query = " DELETE FROM " . static::DB_TABLE . " "
+                    . "WHERE id = " . $this -> getId() . ";";
+            $result = DB::query($query);
+        } else {
+            $this -> setDeleted_at(date('Y-m-d H:i:s')) -> update();
+        }
 
         return $this;
     }

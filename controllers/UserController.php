@@ -14,7 +14,6 @@ class UserController extends BaseController
     // Handle me request
     public function me($request, $response)
     {
-
         // Call the BaseController `index` function
         // That function will return an Output, so no need to Output again.
         return $this -> show($request, $response, array('id' => Session::getUserId()));
@@ -29,7 +28,13 @@ class UserController extends BaseController
         // Do validation on posted fields..
         // ...
         // Check with database
-        $user = (new User()) -> validateLogin($postdata -> email, $postdata -> password);
+        try {
+            $user = (new User()) -> validateLogin($postdata -> email, $postdata -> password);
+        } catch (\Exception $conflict) {
+            // Gets thrown when there are multiple users found
+            // should catch this as an 'MultipleLoginsFoundException' or something like that
+            return Output::Conflict($response, $conflict -> getMessage());
+        }
         if (!$user) {
             return Output::NotFound($response, 'No User found with given credentials!');
         }
