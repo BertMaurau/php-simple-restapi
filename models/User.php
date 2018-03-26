@@ -41,6 +41,12 @@ class User extends BaseModel
     public $email;
     // string
     protected $password;
+    // string
+    public $created_at;
+    // string
+    public $updated_at;
+    // string
+    protected $deleted_at;
 
     // |------------------------------------------------------------------------
     // |  Model Functions
@@ -117,6 +123,21 @@ class User extends BaseModel
         return $this -> password;
     }
 
+    public function getCreated_at()
+    {
+        return $this -> created_at;
+    }
+
+    public function getUpdated_at()
+    {
+        return $this -> updated_at;
+    }
+
+    public function getDeleted_at()
+    {
+        return $this -> deleted_at;
+    }
+
     // |------------------------------------------------------------------------
     // |  Setters
     // |------------------------------------------------------------------------
@@ -172,6 +193,39 @@ class User extends BaseModel
     public function setPassword($password)
     {
         $this -> password = (string) hash('sha256', $password . PASSWORD_SALT);
+        return $this;
+    }
+
+    /**
+     * Set Created At
+     * @param string $created_at
+     * @return $this
+     */
+    public function setCreated_at($created_at)
+    {
+        $this -> created_at = $created_at;
+        return $this;
+    }
+
+    /**
+     * Set Updated At
+     * @param string $updated_at
+     * @return $this
+     */
+    public function setUpdated_at($updated_at)
+    {
+        $this -> updated_at = $updated_at;
+        return $this;
+    }
+
+    /**
+     * Set Deleted At
+     * @param string $deleted_at
+     * @return $this
+     */
+    public function setDeleted_at($deleted_at)
+    {
+        $this -> deleted_at = $deleted_at;
         return $this;
     }
 
