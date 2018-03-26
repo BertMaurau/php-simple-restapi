@@ -1,0 +1,6 @@
+
+This is just a directory to hold "third-party" modules.
+For this "seed", I used the JWT module for example. Most dependencies will be
+loaded or added via the Composer (if available of course)
+
+Every module you add to this directory will be automatically loaded via the loder.php

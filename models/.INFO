@@ -1,0 +1,17 @@
+
+This directory contains all the models/classes/.. whatever you'd like to call them.
+The way I use them won't probably be approved by the standard or whatever.
+
+For what I use them:
+ - Contains the properties/attributes.
+ - Handles DB interaction based on the specified table.
+ - Data interactions.
+
+You can use them however you'd like. They can be fully customized, but the only
+thing that is required (only if it extends the BaseModel) are the const-values.
+
+The getters and setters are optional, but if there are no setters present, all
+the fields will be listed under 'attributes'.
+
+The usage of setters are highly recommended to, give it the proper var-type, do
+some value manipulations, checks, ..

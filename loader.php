@@ -5,38 +5,39 @@
 //
 // Config
 // ------------------------------------------------------------------------------
-require_once 'config/config.php';
+require_once __DIR__ . '/config/config.php';
 
 // DB Connection
 // ------------------------------------------------------------------------------
-require_once 'app/DB.php';
+require_once __DIR__ . '/app/DB.php';
 
 // Static classes
 // ------------------------------------------------------------------------------
-require_once 'app/Auth.php';
-require_once 'app/Env.php';
-require_once 'app/Output.php';
+require_once __DIR__ . '/app/Auth.php';
+require_once __DIR__ . '/app/Env.php';
+require_once __DIR__ . '/app/Output.php';
 
 // Load Middleware
 // ------------------------------------------------------------------------------
-require_once 'middlewares/authentication.php';
+require_once __DIR__ . '/middlewares/authentication.php';
 
 // Load Modules
 // ------------------------------------------------------------------------------
-require_once 'modules/JWT.php';
-
+foreach (glob(__DIR__ . '/modules/*.php') as $module) {
+    require_once $module;
+}
 // Load all Models
 // ------------------------------------------------------------------------------
-foreach (glob("models/*.php") as $model) {
+foreach (glob(__DIR__ . '/models/*.php') as $model) {
     require_once $model;
 }
 
 // Load all controllers
 // ------------------------------------------------------------------------------
-foreach (glob("controllers/*.php") as $controller) {
+foreach (glob(__DIR__ . '/controllers/*.php') as $controller) {
     require_once $controller;
 }
 
 // include the Composer autoloader for external dependencies
 // ------------------------------------------------------------------------------
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';

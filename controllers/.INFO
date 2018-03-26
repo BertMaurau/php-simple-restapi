@@ -1,0 +1,12 @@
+
+This directory is purely for the Controllers.
+
+Controllers will handle the processing of the data using the models and return
+them as a renderable output.
+
+The function name must be used when defining the routes. There are no limits or
+specifications, you can name them as you like.
+
+A function must have the $response, $request, $args (if there are arguments for
+your route) as parameters. You can probably rewrite this part via the BaseController
+constructor or something like that,

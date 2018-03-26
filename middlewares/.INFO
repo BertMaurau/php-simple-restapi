@@ -1,0 +1,5 @@
+
+This folder contains the middelware functions.
+
+A middleware function must be defined as a variable and needs to be set when
+defining the route.

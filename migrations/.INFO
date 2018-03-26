@@ -1,0 +1,6 @@
+
+Put all your migrations here.
+
+I don't use any fancy classes or functions, just plain queries.
+
+All migrations will be logged for handling the up/down directions.
