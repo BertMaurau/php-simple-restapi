@@ -3,6 +3,18 @@
 /**
  * Description of BaseModel
  *
+ * Handle every 'general' function that a Model that extends this class could use.
+ *
+ * - validate       Validate the values against the define rules
+ * - map            Map the values to the model-properties
+ * - addAttrbute    Add non-property values to the model as an attribute
+ * - getById        Get the resource by the given ID
+ * - findBy         Find a model by the given property
+ * - getAll         Get all resources
+ * - insert         Insert/create a new resource
+ * - update         Update an existing resource
+ * - delete         Delete an existing resource
+ *
  * @author Bert Maurau
  */
 class BaseModel
@@ -11,9 +23,12 @@ class BaseModel
     // |------------------------------------------------------------------------
     // |  Model Configuration
     // |------------------------------------------------------------------------
-    // Reference to the Database table
+    // Reference to the Database table (gets set within the Model class)
     const DB_TABLE = "";
+    // Define what is the primary key
+    const PRIMARY_KEY = "id";
     // Allowed filter params for the get requests
+    // Define on which fields the user can filter using GET params.
     const FILTERS = [];
     // Does the table have timestamps?
     // (created_at, updated_at, deleted_at)
@@ -42,7 +57,7 @@ class BaseModel
     public function validate()
     {
         // check if there are validation rules
-        if (count(static::VALIDATION) < 1) {
+        if (count(self::VALIDATION) < 1) {
             // if not, just return valid
             return [true, 'OK'];
         }
@@ -51,30 +66,32 @@ class BaseModel
         $properties = get_object_vars($this);
         foreach ($properties as $property => $value) {
             // check with validation rule
-            // check if property has a rule
-            if (isset(static::VALIDATION[$property])) {
+            //
+            // check if property has a specific rule defined
+            if (isset(self::VALIDATION[$property])) {
 
-                // check if required
-                $reqRequired = static::VALIDATION[$property][0];
+                // check first if it's a required property
+                $reqRequired = self::VALIDATION[$property][0];
                 if (!$value && $reqRequired) {
                     return [false, "Missing required property " . $property];
                 }
 
-                // check var type
-                $reqVarType = static::VALIDATION[$property][1];
+                // check for the variable type
+                $reqVarType = self::VALIDATION[$property][1];
                 $parVarType = gettype($value);
                 if ($parVarType != $reqVarType) {
                     return [false, "Expected `" . $reqVarType . "`, got `" . $parVarType . "` for " . $property];
                 }
 
-                if ($reqVarType == 'email') {
+                // if the property should be an email, do the necessary validations
+                if ($reqVarType === 'email') {
                     if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                         return [false, $value . " is not a valid email address."];
                     }
                 } else {
                     // check min length or value (only strings and integers)
-                    $reqMin = static::VALIDATION[$property][2];
-                    $reqMax = static::VALIDATION[$property][3];
+                    $reqMin = self::VALIDATION[$property][2];
+                    $reqMax = self::VALIDATION[$property][3];
 
                     if ($reqVarType == 'string') {
                         $parLength = strlen($value);
@@ -104,7 +121,7 @@ class BaseModel
     }
 
     /**
-     * Map the given properties to self
+     * Map the given properties to self, calling the setters.
      * @param object $properties
      * @return $this
      */
@@ -147,9 +164,9 @@ class BaseModel
     public function getById($id)
     {
         $query = " SELECT * "
-                . "FROM " . static::DB_TABLE . " "
-                . "WHERE id = $id "
-                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
+                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
+                . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($id) . " "
+                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT 1;";
         $result = DB::query($query);
         if ($result -> num_rows < 1) {
@@ -162,16 +179,26 @@ class BaseModel
 
     /**
      * Get model by specific field
-     * @param string $field
-     * @param type $value
+     * @param array $fieldsWithValues
+     * @param integer $take
+     * @param integer $skip
      * @return $this
      */
-    public function findBy($field, $value, $take = 120, $skip = 0)
+    public function findBy($fieldsWithValues = array(), $take = 120, $skip = 0)
     {
+        // check if the requested field exists for this model
+        foreach ($fieldsWithValues as $field => $value) {
+            if (!in_array($field, get_object_vars($this))) {
+                throw new Exception("`" . $field . "` is not a recognized property.");
+            } else {
+                $conditions[] = "`" . $field . "` = '" . DB::escape($value) . "'";
+            }
+        }
+
         $query = " SELECT * "
-                . "FROM " . static::DB_TABLE . " "
-                . "WHERE $field = '" . DB::escape($value) . "' "
-                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
+                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
+                . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         if ($take && $take === 1) {
@@ -199,7 +226,8 @@ class BaseModel
         // Build WHERE conditions
         $conditions = array();
         foreach ($filter as $field => $value) {
-            if (in_array($field, static::FILTERS)) {
+            // check if the requested filter is allowed or available.
+            if (in_array($field, self::FILTERS)) {
                 $conditions[] = "`$field` LIKE '%$value%'";
             }
         }
@@ -210,9 +238,9 @@ class BaseModel
 
         $response = [];
         $query = " SELECT * "
-                . "FROM " . static::DB_TABLE . " "
+                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
                 . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
-                . ((static::SOFT_DELETES) ? " AND (" . static::DB_TABLE . ".deleted_at IS NULL OR " . static::DB_TABLE . ".deleted_at = '0000-00-00 00:00:00')" : "")
+                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         while ($row = $result -> fetch_assoc()) {
@@ -227,22 +255,23 @@ class BaseModel
      */
     public function insert()
     {
-        // This should be modified, write it more securly to prevent from trying to insert public properties
+        // This should be modified to be a bit more secure, but normally public
+        // properties will be filtered out, as well as the attributes property.
         foreach ($this as $key => $value) {
-            if ($key !== 'attributes') {
-                $keys[] = '`' . $key . '`';
+            if ($key !== 'attributes' && in_array($key, get_object_vars($this))) {
+                $keys[] = '`' . DB::escape($key) . '`';
                 $values[] = DB::escape($value);
             }
         }
 
-        // Do checks here for security..
+        // Do more checks here for security..
 
         $query = " INSERT "
-                . "INTO " . static::DB_TABLE . "(" . implode(",", $keys) . ") "
+                . "INTO " . DB_PREFIX . self::DB_TABLE . "(" . implode(",", $keys) . ") "
                 . "VALUES ('" . implode("','", $values) . "');";
         $result = DB::query($query);
 
-        // Get the ID
+        // Get the ID and add it to the model response
         $this -> id = DB::getId();
 
         return $this;
@@ -254,16 +283,17 @@ class BaseModel
      */
     public function update()
     {
-        // This should be modified, write it more securly to prevent from trying to insert public properties
+        // This should be modified to be a bit more secure, but normally public
+        // properties will be filtered out, as well as the attributes property.
         foreach ($this as $key => $value) {
-            if ($key !== 'attributes') {
-                $update[] = '`' . $key . '`' . " = '" . DB::escape($value) . "'";
+            if ($key !== 'attributes' && in_array($key, get_object_vars($this))) {
+                $update[] = '`' . DB::escape($key) . '`' . " = '" . DB::escape($value) . "'";
             }
         }
 
-        $query = " UPDATE " . static::DB_TABLE . " "
+        $query = " UPDATE " . DB_PREFIX . self::DB_TABLE . " "
                 . "SET " . implode(",", $update) . " "
-                . "WHERE id = " . $this -> getId() . ";";
+                . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
         $result = DB::query($query);
 
         return $this;
@@ -271,15 +301,17 @@ class BaseModel
 
     /**
      * Delete Model
+     * $param boolean force hard-delete
      * @return $this
      */
     public function delete($hardDelete = false)
     {
-        if ($hardDelete || !static::SOFT_DELETES) {
-            $query = " DELETE FROM " . static::DB_TABLE . " "
-                    . "WHERE id = " . $this -> getId() . ";";
+        if (ALLOW_FORCE_DELETES && ($hardDelete || !self::SOFT_DELETES)) {
+            $query = " DELETE FROM " . DB_PREFIX . self::DB_TABLE . " "
+                    . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
             $result = DB::query($query);
         } else {
+            // update the timestamp
             $this -> setDeleted_at(date('Y-m-d H:i:s')) -> update();
         }
 

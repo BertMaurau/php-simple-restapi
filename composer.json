@@ -1,8 +1,8 @@
 {
     "name": "bertmaurau/php-simple-restapi",
-    "description": "A Simple and Basic Restfull API",
-    "keywords": ["php", "api", "rest", "project", "seed"],
-    "version": "1.2.1",
+    "description": "A Simple and Basic RESTful API",
+    "keywords": ["php", "api", "rest", "restful", "project", "seed"],
+    "version": "1.3.1",
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",

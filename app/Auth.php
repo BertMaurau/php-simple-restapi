@@ -1,21 +1,24 @@
 <?php
 
 /**
- * Description of Session
+ * Description of Auth
+ *
+ * Handles everything concerning the Authentication and user sessions etc.
  *
  * @author Bert Maurau
  */
-class Session
+class Auth
 {
 
-    // put session items here
+    // Put auth items here for easier access
+    // Don't forget to add the necessary getter/setter.
     private static $userId;
 
     /**
-     * Load Session values
+     * Load Auth values
      * @param array $properties
      */
-    public function loadSession($properties = null)
+    public function loadAuth($properties = null)
     {
         foreach ($properties as $key => $value) {
             if (isset($properties)) {

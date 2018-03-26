@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of output
+ * Description of Output
+ *
+ * Handles everything concerning the actual data output.
  *
  * @author Bert Maurau
  */
@@ -29,7 +31,7 @@ class Output
         // actual output
         $response -> getBody()
                 // write the output
-                -> write(json_encode($data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+                -> write(json_encode($data, JSON_PRETTY_PRINT));
         // set the HTTP_CODE
         return $response -> withStatus($code);
     }
@@ -54,7 +56,9 @@ class Output
      */
     public static function ModelNotFound($response, $modelName, $modelId)
     {
-        return self::JSON($response, self::CODE_NOT_FOUND, array('code' => self::CODE_NOT_FOUND, 'message' => $modelName . ' with ID ' . $modelId . ' not found!'));
+        return self::JSON($response, self::CODE_NOT_FOUND, array(
+                    'code'    => self::CODE_NOT_FOUND,
+                    'message' => $modelName . ' with ID ' . $modelId . ' not found!'));
     }
 
     /**
@@ -65,7 +69,9 @@ class Output
      */
     public static function NotFound($response, $message)
     {
-        return self::JSON($response, self::CODE_NOT_FOUND, array('code' => self::CODE_NOT_FOUND, 'message' => $message));
+        return self::JSON($response, self::CODE_NOT_FOUND, array(
+                    'code'    => self::CODE_NOT_FOUND,
+                    'message' => $message));
     }
 
     /**
@@ -76,7 +82,9 @@ class Output
      */
     public static function Conflict($response, $message)
     {
-        return self::JSON($response, self::CODE_CONFLICT, array('code' => self::CODE_CONFLICT, 'message' => $message));
+        return self::JSON($response, self::CODE_CONFLICT, array(
+                    'code'    => self::CODE_CONFLICT,
+                    'message' => $message));
     }
 
     /**
@@ -87,7 +95,9 @@ class Output
      */
     public static function ValidationFailed($response, $message)
     {
-        return self::JSON($response, self::CODE_VALIDATION_FAILED, array('code' => self::CODE_VALIDATION_FAILED, 'message' => $message));
+        return self::JSON($response, self::CODE_VALIDATION_FAILED, array(
+                    'code'    => self::CODE_VALIDATION_FAILED,
+                    'message' => $message));
     }
 
     /**
@@ -97,7 +107,9 @@ class Output
      */
     public static function MissingModelId($response)
     {
-        return self::JSON($response, self::CODE_MISSING_PARAMETER, array('code' => self::CODE_MISSING_PARAMETER, 'message' => "Missing ModelID {id} parameter!"));
+        return self::JSON($response, self::CODE_MISSING_PARAMETER, array(
+                    'code'    => self::CODE_MISSING_PARAMETER,
+                    'message' => "Missing ModelID {id} parameter!"));
     }
 
 }

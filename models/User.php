@@ -13,6 +13,8 @@ class User extends BaseModel
     // |------------------------------------------------------------------------
     // Reference to the Database table
     const DB_TABLE = "users";
+    // Define what is the primary key
+    const PRIMARY_KEY = "id";
     // Allowed filter params for the get requests
     const FILTERS = ['firstname', 'lastname', 'email'];
     // Does the table have timestamps? (created_at, updated_at, deleted_at)
@@ -53,18 +55,17 @@ class User extends BaseModel
     {
         // do not forget to call your setter first to do any manipulations
         // like hashing the password..
-        $this -> setEmail($email) -> setPassword($password);
+        $this
+                -> setEmail($email)
+                -> setPassword($password);
 
-        $query = "SELECT * FROM " . static::DB_TABLE . " "
-                . "WHERE email = '" . DB::escape($this -> getEmail()) . "' "
-                . " AND password = '" . DB::escape($this -> getPassword()) . "';";
-        $result = DB::query($query);
-        if ($result -> num_rows < 1) {
+        $user = $this -> findBy(array(
+            'email'    => $this -> getEmail(),
+            'password' => $this -> getPassword()), 1);
+        if (!$user) {
             return null;
-        } else if ($result -> num_rows > 1) {
-            throw new Exception("Multiple logins found. Conflict!");
         } else {
-            return $this -> map($result -> fetch_assoc());
+            return $user;
         }
     }
 

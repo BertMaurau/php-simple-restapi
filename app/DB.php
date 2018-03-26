@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of connection
+ * Description of DB
+ *
+ * This handles everything concerning the Database connection.
  *
  * @author Bert Maurau
  */
@@ -9,18 +11,33 @@ class DB
 {
 
     // holds the connection with the database
-    public static $mysqli;
+    private static $mysqli;
 
     /**
-     * Init a new connection
+     * Init a new connection depending on the current environment.
+     * The environments can be defined within the app/Env file.
      * @throws Exception
      */
     static function init()
     {
-        self::$mysqli = new mysqli(Constants::DB_HOST, Constants::DB_USER, Constants::DB_PASS, Constants::DB_NAME);
-        if (!self::$mysqli) {
-            throw new Exception(self::getLastError());
+        switch (Env::getEnv()) {
+
+            case Env::ENV_LOCALHOST:
+                self::$mysqli = new mysqli(DB_LOCAL_HOST, DB_LOCAL_USER, DB_LOCAL_PASS, DB_LOCAL_NAME);
+                break;
+            case Env::ENV_DEVELOPMENT:
+                self::$mysqli = new mysqli(DB_DEV_HOST, DB_DEV_USER, DB_DEV_PASS, DB_DEV_NAME);
+                break;
+            /*
+             * Add as many environment connects as you want. As long as you have
+             * the required database credentials configured.
+             */
+            default:
+                break;
         }
+
+        // Set the charset to allow for example emoticons
+        self::$mysqli -> set_charset(DB_CHARSET);
     }
 
     /**
@@ -52,13 +69,13 @@ class DB
     }
 
     /**
-     * Execute a given query
-     * @param string $sql
+     * Execute the given query
+     * @param string $query
      * @return resultset
      */
-    public static function query($sql)
+    public static function query($query)
     {
-        if (!$result = self::$mysqli -> query($sql)) {
+        if (!$result = self::$mysqli -> query($query)) {
             throw new Exception(self::getLastError());
         }
         return $result;
@@ -75,7 +92,7 @@ class DB
     }
 
     /**
-     * Return the last mysql error
+     * Return the last mysqli error
      * @return string
      */
     public static function getLastError()
