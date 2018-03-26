@@ -35,7 +35,7 @@ foreach ($migrations as $migration) {
     try {
         $result = $migration -> getMigrationByVersion($migration -> getVersion());
     } catch (Exception $ex) {
-
+        echo $ex -> getMessage() . PHP_EOL;
     }
 
     // check if it has been previously executed and if the direction was the same
@@ -46,6 +46,7 @@ foreach ($migrations as $migration) {
         // check if the direction is a callable function
         if (!is_callable(array($migration, $direction))) {
             echo "  Unknown migration direction: " . $direction . PHP_EOL;
+            continue;
         }
 
         echo "No previous run found" . PHP_EOL;

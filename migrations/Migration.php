@@ -3,6 +3,8 @@
 /**
  * Description of Migration
  *
+ * Handles the execution of DB migrations/seedings
+ *
  * @author Bert Maurau
  */
 class Migration extends BaseModel
@@ -29,9 +31,10 @@ class Migration extends BaseModel
     public function getMigrationByVersion($version)
     {
         $query = " SELECT * "
-                . "FROM " . DB::DB_PREFIX . "migrations "
-                . "WHERE version = '" . DB::escape($version) . "' "
+                . "FROM " . DB::getDatabase() . ".`" . DB_PREFIX . "migrations` "
+                . "WHERE `version` = '" . DB::escape($version) . "' "
                 . "LIMIT 1;";
+
         $result = DB::query($query);
         if ($result -> num_rows < 1) {
             return false;

@@ -12,7 +12,7 @@ class mig001_init extends Migration
         /**
          * General info about the migration
          */
-        $this -> setVersion('0.0.1');
+        $this -> setVersion('1.3.1');
         $this -> setName('mig001_init'); // must be the same as the classname
         $this -> setDescription('The initial creation of the database structure for version v1.3.1.');
         $this -> setStopOnFatal(false);
@@ -28,9 +28,9 @@ class mig001_init extends Migration
     {
 
         // First, create the database if it doesn't exist already
-        $sql = "CREATE DATABASE IF NOT EXISTS `" . DB::getDatabase() . "` CHARACTER SET " . DB_CHARSET . " COLLATE " . DB_COLLATE . ";";
+        $query = "CREATE DATABASE IF NOT EXISTS `" . DB::getDatabase() . "` CHARACTER SET " . DB_CHARSET . " COLLATE " . DB_COLLATE . ";";
         try {
-            DB::query($sql);
+            DB::query($query);
             echo "   Database is present: `" . DB::getDatabase() . "`" . PHP_EOL;
         } catch (Exception $ex) {
             echo "   " . $ex -> getMessage() . PHP_EOL;
@@ -42,7 +42,7 @@ class mig001_init extends Migration
         DB::init($connectWithDb = true);
 
         // create the migrations table
-        $sql = "CREATE TABLE `" . DB_PREFIX . "migrations` (
+        $query = "CREATE TABLE `" . DB_PREFIX . "migrations` (
                     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                     `version` varchar(5) DEFAULT NULL,
                     `name` varchar(32) DEFAULT NULL,
@@ -55,7 +55,7 @@ class mig001_init extends Migration
                     PRIMARY KEY (`id`)
                   )";
         try {
-            DB::query($sql);
+            DB::query($query);
             echo "   Created Table: `" . DB_PREFIX . "migrations`" . PHP_EOL;
         } catch (Exception $ex) {
             echo "   " . $ex -> getMessage() . PHP_EOL;
@@ -66,11 +66,12 @@ class mig001_init extends Migration
         }
 
         // create the users table
-        $sql = "CREATE TABLE `" . DB_PREFIX . "users` (
+        $query = "CREATE TABLE `" . DB_PREFIX . "users` (
                     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                     `firstname` varchar(64) DEFAULT NULL,
                     `lastname` varchar(64) DEFAULT NULL,
                     `email` varchar(128) DEFAULT NULL,
+                    `password` varchar(64) DEFAULT NULL,
                     `deleted_at` datetime DEFAULT NULL,
                     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -78,8 +79,26 @@ class mig001_init extends Migration
                     UNIQUE KEY `email` (`email`)
                   )";
         try {
-            DB::query($sql);
+            DB::query($query);
             echo "   Created Table: `" . DB_PREFIX . "users`" . PHP_EOL;
+
+            // create a placeholder user
+            $user = (new User())
+                    -> setFirstname("John")
+                    -> setLastname("Doe")
+                    -> setEmail("john.doe@skynet.com")
+                    -> setPassword("johnnydoe123")
+                    -> insert();
+            echo "   Inserted dummy-user `John Doe` (ID: " . $user -> getId() . ")." . PHP_EOL;
+
+            $user = (new User())
+                    -> setFirstname("Jane")
+                    -> setLastname("Doe")
+                    -> setEmail("jane.doe@skynet.com")
+                    -> setPassword("goodlookingjane69")
+                    -> insert();
+
+            echo "   Inserted dummy-user `Jane Doe` (ID: " . $user -> getId() . ")." . PHP_EOL;
         } catch (Exception $ex) {
             echo "   " . $ex -> getMessage() . PHP_EOL;
             if ($this -> getStopOnFatal()) {
@@ -96,9 +115,9 @@ class mig001_init extends Migration
     {
         DB::init($connectWithDb = false);
 
-        $sql = "DROP DATABASE IF EXISTS `" . DB::getDatabase() . "`;";
+        $query = "DROP DATABASE IF EXISTS `" . DB::getDatabase() . "`;";
         try {
-            DB::query($sql);
+            DB::query($query);
             echo "   Dropped Datbase: `" . DB::getDatabase() . "`" . PHP_EOL;
         } catch (Exception $ex) {
             echo "   " . $ex -> getMessage() . PHP_EOL;
