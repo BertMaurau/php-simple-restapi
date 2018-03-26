@@ -13,6 +13,9 @@ class DB
     // holds the connection with the database
     private static $mysqli;
     private static $database;
+    private static $host;
+    private static $user;
+    private static $password;
 
     /**
      * Init a new connection depending on the current environment.
@@ -24,16 +27,22 @@ class DB
         switch (Env::getEnv()) {
 
             case Env::ENV_LOCALHOST:
-                self::$database = ($connectWithDatabase) ? DB_LOCAL_NAME : null;
-                self::$mysqli = new mysqli(DB_LOCAL_HOST, DB_LOCAL_USER, DB_LOCAL_PASS, self::$database);
+                self::$database = DB_LOCAL_NAME;
+                self::$user = DB_LOCAL_USER;
+                self::$password = DB_LOCAL_PASS;
+                self::$host = DB_LOCAL_HOST;
                 break;
             case Env::ENV_DEVELOPMENT:
-                self::$database = ($connectWithDatabase) ? DB_DEV_NAME : null;
-                self::$mysqli = new mysqli(DB_DEV_HOST, DB_DEV_USER, DB_DEV_PASS, self::$database);
+                self::$database = DB_DEV_NAME;
+                self::$user = DB_DEV_USER;
+                self::$password = DB_DEV_PASS;
+                self::$host = DB_DEV_HOST;
                 break;
             case Env::ENV_PRODUCTION:
-                self::$database = ($connectWithDatabase) ? DB_DEV_NAME : null;
-                self::$mysqli = new mysqli(DB_PROD_HOST, DB_PROD_USER, DB_PROD_PASS, self::$database);
+                self::$database = DB_PROD_NAME;
+                self::$user = DB_PROD_USER;
+                self::$password = DB_PROD_PASS;
+                self::$host = DB_PROD_HOST;
                 break;
             /*
              * Add as many environment connects as you want. As long as you have
@@ -42,6 +51,12 @@ class DB
             default:
                 break;
         }
+
+        // connect with the database
+        if (!self::$mysqli = new mysqli(self::$host, self::$user, self::$password, ($connectWithDatabase) ? self::$database : null)) {
+            throw new Exception("Failed to connect with the Database.");
+        }
+
 
         // Set the charset to allow for example emoticons
         self::$mysqli -> set_charset(DB_CHARSET);
@@ -109,7 +124,7 @@ class DB
 
     /**
      * Return the current database
-     * @return string database name 
+     * @return string database name
      */
     public static function getDatabase()
     {
