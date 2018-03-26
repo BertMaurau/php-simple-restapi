@@ -269,6 +269,10 @@ class BaseModel
         $query = " INSERT "
                 . "INTO " . DB_PREFIX . self::DB_TABLE . "(" . implode(",", $keys) . ") "
                 . "VALUES ('" . implode("','", $values) . "');";
+
+        // replace nulls with real nulls (for ex. deleted_at)
+        $query = str_replace("'(null)'", "NULL", $query);
+
         $result = DB::query($query);
 
         // Get the ID and add it to the model response
@@ -294,6 +298,10 @@ class BaseModel
         $query = " UPDATE " . DB_PREFIX . self::DB_TABLE . " "
                 . "SET " . implode(",", $update) . " "
                 . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
+
+        // replace nulls with real nulls (for ex. deleted_at)
+        $query = str_replace("'(null)'", "NULL", $query);
+
         $result = DB::query($query);
 
         return $this;
