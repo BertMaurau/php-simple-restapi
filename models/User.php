@@ -171,7 +171,7 @@ class User extends BaseModel
      */
     public function setPassword($password)
     {
-        $this -> password = (string) hash('sha256', $password . Constants::PASSWORD_SALT);
+        $this -> password = (string) hash('sha256', $password . PASSWORD_SALT);
         return $this;
     }
 
