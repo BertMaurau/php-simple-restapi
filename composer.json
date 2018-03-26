@@ -1,8 +1,10 @@
 {
     "name": "bertmaurau/php-simple-restapi",
-    "description": "A Simple and Basic RESTful API",
+    "description": "A Simple and Basic RESTful API Example",
     "keywords": ["php", "api", "rest", "restful", "project", "seed"],
     "version": "1.3.1",
+    "homepage": "https://github.com/BertMaurau/php-simple-restapi",
+    "license": "MIT",
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
@@ -14,5 +16,9 @@
             "name": "Bert Maurau",
             "email": "hello@bertmaurau.be"
         }
-    ]
+    ],
+    "support": {
+        "email": "hello@bertmaurau.be",
+        "issues": "https://github.com/BertMaurau/php-simple-restapi/issues"
+    }
 }
