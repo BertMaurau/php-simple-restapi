@@ -166,7 +166,7 @@ class BaseModel
         $query = " SELECT * "
                 . "FROM " . DB_PREFIX . static::DB_TABLE . " "
                 . "WHERE `" . static::PRIMARY_KEY . "` = " . DB::escape($id) . " "
-                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL " : "")
                 . "LIMIT 1;";
         $result = DB::query($query);
         if ($result -> num_rows < 1) {
@@ -188,7 +188,7 @@ class BaseModel
     {
         // check if the requested field exists for this model
         foreach ($fieldsWithValues as $field => $value) {
-            if (!in_array($field, get_object_vars($this))) {
+            if (!array_key_exists($field, get_object_vars($this))) {
                 throw new Exception("`" . $field . "` is not a recognized property.");
             } else {
                 $conditions[] = "`" . $field . "` = '" . DB::escape($value) . "'";
@@ -197,8 +197,8 @@ class BaseModel
 
         $query = " SELECT * "
                 . "FROM " . DB_PREFIX . static::DB_TABLE . " "
-                . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
-                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
+                . "WHERE 1=1 " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL " : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         if ($take && $take === 1) {
@@ -239,9 +239,10 @@ class BaseModel
         $response = [];
         $query = " SELECT * "
                 . "FROM " . DB_PREFIX . static::DB_TABLE . " "
-                . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
-                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
+                . "WHERE 1=1 " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL " : "")
                 . "LIMIT $take OFFSET $skip;";
+
         $result = DB::query($query);
         while ($row = $result -> fetch_assoc()) {
             $response[] = (new $this) -> map($row);
