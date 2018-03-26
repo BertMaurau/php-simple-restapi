@@ -27,14 +27,26 @@ define('PASSWORD_SALT', '4vWdhVs>O_UtX+|c6v+6[RrhK+tN[;@oAji:0%VBsV$iy*#jwmb|T+k
 // Recommended to use the IP address instead of localhost. Localhost could
 // (depending on the machine running it) result in socket-connection errors.
 // ------------------------------------------------------------------------------
-define('DB_HOST', '127.0.0.1');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'mydatabase');
+// Localhost
+define('DB_LOCAL_HOST', '127.0.0.1');
+define('DB_LOCAL_USER', 'root');
+define('DB_LOCAL_PASS', '');
+define('DB_LOCAL_NAME', 'mydatabase');
+// Development
+define('DB_DEV_HOST', '127.0.0.1');
+define('DB_DEV_USER', 'root');
+define('DB_DEV_PASS', '');
+define('DB_DEV_NAME', 'mydatabase');
+// Production
+define('DB_PROD_HOST', '127.0.0.1');
+define('DB_PROD_USER', 'root');
+define('DB_PROD_PASS', '');
+define('DB_PROD_NAME', 'mydatabase');
 // Set this if you'd like to have a Databse table Prefix
 define('DB_PREFIX', '');
 // The global charset for the database
 define('DB_CHARSET', 'utf8mb4');
+define('DB_COLLATE', 'utf8mb4_unicode_ci');
 
 // ------------------------------------------------------------------------------
 // Domains
