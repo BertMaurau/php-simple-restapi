@@ -57,7 +57,7 @@ class BaseModel
     public function validate()
     {
         // check if there are validation rules
-        if (count(self::VALIDATION) < 1) {
+        if (count(static::VALIDATION) < 1) {
             // if not, just return valid
             return [true, 'OK'];
         }
@@ -68,16 +68,16 @@ class BaseModel
             // check with validation rule
             //
             // check if property has a specific rule defined
-            if (isset(self::VALIDATION[$property])) {
+            if (isset(static::VALIDATION[$property])) {
 
                 // check first if it's a required property
-                $reqRequired = self::VALIDATION[$property][0];
+                $reqRequired = static::VALIDATION[$property][0];
                 if (!$value && $reqRequired) {
                     return [false, "Missing required property " . $property];
                 }
 
                 // check for the variable type
-                $reqVarType = self::VALIDATION[$property][1];
+                $reqVarType = static::VALIDATION[$property][1];
                 $parVarType = gettype($value);
                 if ($parVarType != $reqVarType) {
                     return [false, "Expected `" . $reqVarType . "`, got `" . $parVarType . "` for " . $property];
@@ -90,8 +90,8 @@ class BaseModel
                     }
                 } else {
                     // check min length or value (only strings and integers)
-                    $reqMin = self::VALIDATION[$property][2];
-                    $reqMax = self::VALIDATION[$property][3];
+                    $reqMin = static::VALIDATION[$property][2];
+                    $reqMax = static::VALIDATION[$property][3];
 
                     if ($reqVarType == 'string') {
                         $parLength = strlen($value);
@@ -164,9 +164,9 @@ class BaseModel
     public function getById($id)
     {
         $query = " SELECT * "
-                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
-                . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($id) . " "
-                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
+                . "FROM " . DB_PREFIX . static::DB_TABLE . " "
+                . "WHERE `" . static::PRIMARY_KEY . "` = " . DB::escape($id) . " "
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT 1;";
         $result = DB::query($query);
         if ($result -> num_rows < 1) {
@@ -196,9 +196,9 @@ class BaseModel
         }
 
         $query = " SELECT * "
-                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
+                . "FROM " . DB_PREFIX . static::DB_TABLE . " "
                 . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
-                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         if ($take && $take === 1) {
@@ -227,7 +227,7 @@ class BaseModel
         $conditions = array();
         foreach ($filter as $field => $value) {
             // check if the requested filter is allowed or available.
-            if (in_array($field, self::FILTERS)) {
+            if (in_array($field, static::FILTERS)) {
                 $conditions[] = "`$field` LIKE '%$value%'";
             }
         }
@@ -238,9 +238,9 @@ class BaseModel
 
         $response = [];
         $query = " SELECT * "
-                . "FROM " . DB_PREFIX . self::DB_TABLE . " "
+                . "FROM " . DB_PREFIX . static::DB_TABLE . " "
                 . "WHERE " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
-                . ((self::SOFT_DELETES) ? " AND " . DB_PREFIX . self::DB_TABLE . ".deleted_at IS NULL" : "")
+                . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL" : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
         while ($row = $result -> fetch_assoc()) {
@@ -257,8 +257,8 @@ class BaseModel
     {
         // This should be modified to be a bit more secure, but normally public
         // properties will be filtered out, as well as the attributes property.
-        foreach ($this as $key => $value) {
-            if ($key !== 'attributes' && in_array($key, get_object_vars($this))) {
+        foreach (get_object_vars($this) as $key => $value) {
+            if ($key !== 'attributes' && !empty($value) && is_callable(array($this, 'get' . ucfirst($key)))) {
                 $keys[] = '`' . DB::escape($key) . '`';
                 $values[] = DB::escape($value);
             }
@@ -267,7 +267,7 @@ class BaseModel
         // Do more checks here for security..
 
         $query = " INSERT "
-                . "INTO " . DB_PREFIX . self::DB_TABLE . "(" . implode(",", $keys) . ") "
+                . "INTO " . DB_PREFIX . static::DB_TABLE . "(" . implode(",", $keys) . ") "
                 . "VALUES ('" . implode("','", $values) . "');";
 
         // replace nulls with real nulls (for ex. deleted_at)
@@ -289,15 +289,15 @@ class BaseModel
     {
         // This should be modified to be a bit more secure, but normally public
         // properties will be filtered out, as well as the attributes property.
-        foreach ($this as $key => $value) {
-            if ($key !== 'attributes' && in_array($key, get_object_vars($this))) {
+        foreach (get_object_vars($this) as $key => $value) {
+            if ($key !== 'attributes' && !empty($value) && is_callable(array($this, 'get' . ucfirst($key)))) {
                 $update[] = '`' . DB::escape($key) . '`' . " = '" . DB::escape($value) . "'";
             }
         }
 
-        $query = " UPDATE " . DB_PREFIX . self::DB_TABLE . " "
+        $query = " UPDATE " . DB_PREFIX . static::DB_TABLE . " "
                 . "SET " . implode(",", $update) . " "
-                . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
+                . "WHERE `" . static::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
 
         // replace nulls with real nulls (for ex. deleted_at)
         $query = str_replace("'(null)'", "NULL", $query);
@@ -314,9 +314,9 @@ class BaseModel
      */
     public function delete($hardDelete = false)
     {
-        if (ALLOW_FORCE_DELETES && ($hardDelete || !self::SOFT_DELETES)) {
-            $query = " DELETE FROM " . DB_PREFIX . self::DB_TABLE . " "
-                    . "WHERE `" . self::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
+        if (ALLOW_FORCE_DELETES && ($hardDelete || !static::SOFT_DELETES)) {
+            $query = " DELETE FROM " . DB_PREFIX . static::DB_TABLE . " "
+                    . "WHERE `" . static::PRIMARY_KEY . "` = " . DB::escape($this -> getId()) . ";";
             $result = DB::query($query);
         } else {
             // update the timestamp
