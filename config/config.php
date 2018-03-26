@@ -31,17 +31,17 @@ define('PASSWORD_SALT', '4vWdhVs>O_UtX+|c6v+6[RrhK+tN[;@oAji:0%VBsV$iy*#jwmb|T+k
 define('DB_LOCAL_HOST', '127.0.0.1');
 define('DB_LOCAL_USER', 'root');
 define('DB_LOCAL_PASS', '');
-define('DB_LOCAL_NAME', 'mydatabase');
+define('DB_LOCAL_NAME', 'myapidatabase');
 // Development
 define('DB_DEV_HOST', '127.0.0.1');
 define('DB_DEV_USER', 'root');
 define('DB_DEV_PASS', '');
-define('DB_DEV_NAME', 'mydatabase');
+define('DB_DEV_NAME', 'myapidatabase');
 // Production
 define('DB_PROD_HOST', '127.0.0.1');
 define('DB_PROD_USER', 'root');
 define('DB_PROD_PASS', '');
-define('DB_PROD_NAME', 'mydatabase');
+define('DB_PROD_NAME', 'myapidatabase');
 // Set this if you'd like to have a Databse table Prefix
 define('DB_PREFIX', '');
 // The global charset for the database
