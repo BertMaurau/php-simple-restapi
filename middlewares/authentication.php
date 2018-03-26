@@ -21,13 +21,11 @@ $authentication = function ($request, $response, callable $next) {
             // Send response when the integrity-check of the Token failed.
             // This will happen if the passed encrypted data is not a valid JSON-string
             // due to a wrong encryption or bad encoding.
-            $response -> getBody() -> write(Output::JSON(array("code" => 401, "message" => "Token integrity-check failed!")));
-            return $response -> withStatus(401);
+            return Output::NotAuthorized($response, "Token integrity-check failed!");
         }
     } else {
         // The response when there is no Token present
-        $response -> getBody() -> write(Output::JSON(array("code" => 401, "message" => "No Token present!")));
-        return $response -> withStatus(401);
+        return Output::NotAuthorized($response, "No Token present!");
     }
 
     // Continue the request if the user is allowed (passed the above checks)
