@@ -16,6 +16,7 @@ class Output
     const CODE_MISSING_PARAMETER = 406;
     const CODE_VALIDATION_FAILED = 406;
     const CODE_OK = 200;
+    const CODE_NOT_AUTHORIZED = 401;
 
     /**
      * JSON Output
@@ -110,6 +111,18 @@ class Output
         return self::JSON($response, self::CODE_MISSING_PARAMETER, array(
                     'code'    => self::CODE_MISSING_PARAMETER,
                     'message' => "Missing ModelID {id} parameter!"));
+    }
+
+    /**
+     * Return Not Authorized status
+     * @param Response $response
+     * @return JSON Output
+     */
+    public static function NotAuthorized($response, $message)
+    {
+        return self::JSON($response, self::CODE_NOT_AUTHORIZED, array(
+                    'code'    => self::CODE_NOT_AUTHORIZED,
+                    'message' => $message));
     }
 
 }
