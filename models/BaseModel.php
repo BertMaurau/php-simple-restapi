@@ -197,7 +197,7 @@ class BaseModel
 
         $query = " SELECT * "
                 . "FROM " . DB_PREFIX . static::DB_TABLE . " "
-                . "WHERE 1=1 " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . "WHERE 1=1 " . ((count($conditions)) ? ' AND ' . implode(' AND ', $conditions) : "") . " "
                 . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL " : "")
                 . "LIMIT $take OFFSET $skip;";
         $result = DB::query($query);
@@ -239,7 +239,7 @@ class BaseModel
         $response = [];
         $query = " SELECT * "
                 . "FROM " . DB_PREFIX . static::DB_TABLE . " "
-                . "WHERE 1=1 " . ((count($conditions)) ? implode(' AND ', $conditions) : "") . " "
+                . "WHERE 1=1 " . ((count($conditions)) ? ' AND ' . implode(' AND ', $conditions) : "") . " "
                 . ((static::SOFT_DELETES) ? " AND " . DB_PREFIX . static::DB_TABLE . ".deleted_at IS NULL " : "")
                 . "LIMIT $take OFFSET $skip;";
 
